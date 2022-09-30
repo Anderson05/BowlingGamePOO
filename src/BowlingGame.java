@@ -4,7 +4,7 @@ import java.util.List;
 public class BowlingGame {
 	
 	public static final int MAX_PINS_PER_ROLL = 10;
-	public static final int NUMBER_OF_ROLLS_PER_GAME = 10;
+	public static final int NUMBER_OF_ROLLS_PER_GAME = 5;
 	public static final int NUMBER_OF_TRIES_PER_ROLL = 2;
 	
 	private String player;
@@ -48,29 +48,35 @@ public class BowlingGame {
 		return this.getRolls().get(index);
 	}
 	
-	public int getRollScore(int roll_index) {
+	public int getRollScore(int roll_index) throws Exception {
 		Roll r = this.getRollAt(roll_index);
-		if(r.isBonus()) {
-			return r.getPinsKnocked();
-		}
-		if(r.isSpare()) {
-			return (10 + rolls.get(roll_index+1).getFirstThrow().getPinsKnocked());
-		}
-		if(r.isStrike()) {
-			Roll nextRoll = rolls.get(roll_index+1);
+		
+		if(r.isSpare()) { // Player hits all pins in two tries
+			return (10 + this.getRollAt(roll_index+1).getFirstThrow().getPinsKnocked());
+		}else if(r.isStrike()) {
+			Roll nextRoll = this.getRollAt(roll_index+1);
 			if (nextRoll.isBonus()) { // Bonus Roll has only one throw
 				return (10 + nextRoll.getFirstThrow().getPinsKnocked()
-						+ rolls.get(roll_index+2).getFirstThrow().getPinsKnocked());
+						+ this.getRollAt(roll_index+2).getFirstThrow().getPinsKnocked());
 			}else {
 				// 10 + sum of the next two throws
 				if(nextRoll.isStrike()) {
-					Roll nextRoll2 = rolls.get(roll_index+2);
+					Roll nextRoll2 = this.getRollAt(roll_index+2);
 					return 10 + nextRoll.getPinsKnocked() + nextRoll2.getFirstThrow().getPinsKnocked();
 				}else {
 					return 10 + nextRoll.getPinsKnocked();	
 				} 
 			}
+		}else { // It is a bonus roll or a roll where the player failed to hits all the pins
+			return r.getPinsKnocked(); //Simple sum of next two tries
 		}
-		return 0;
+	}
+	
+	public int getGameScore() throws Exception {
+		int score=0;
+		for (int i = 0; i < NUMBER_OF_ROLLS_PER_GAME; i++) {
+			score += getRollScore(i);
+		}
+		return score;
 	}
 }

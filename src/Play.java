@@ -1,53 +1,59 @@
 import java.util.Scanner;
 
 public class Play {
-
-	private BowlingGame party;
 	
 	private static final String ERROR_NOT_ENOUGHT_ROLLS = "ERROR: NOT ENOUGH ROLLS";
 	private static final String ERROR_TOO_MUCH_ROLLS = "ERROR: TOO MUCH ROLLS";
+	
 	
 	public static void main(String[] args) throws Exception {
 	
 		System.out.println("Player Name :");
 		Scanner sc = new Scanner(System.in);
-		BowlingGame game = new BowlingGame("Demo");
-//		System.out.println(RollResult.values()[12]);
-//		System.out.println(RollResult.SPARE.ordinal());
+		String pname = sc.next();	
+		BowlingGame game = new BowlingGame(pname);
 
-		int index=0, bonusStrike=0, bonusSpare=0;
+		int index = 0;
 		String continue_input = "y";
-		System.out.println("Fill in the sequence of rolls "+ continue_input);
+		System.out.println("Fill in the sequence of " + BowlingGame.NUMBER_OF_ROLLS_PER_GAME +" rolls ");
 		do {
 			System.out.println("Roll #"+ (index+1));
 			Roll roll = new Roll(index);
-			System.out.println("Number of pins knocked in first throw");		
-			int firstThrow = sc.nextInt();
+			int firstThrow = 0;	
+			do{
+				System.out.println("Number of pins knocked in first throw [0-"+BowlingGame.MAX_PINS_PER_ROLL+"]");
+				firstThrow = sc.nextInt();
+	        }while((firstThrow < 0 || firstThrow > BowlingGame.MAX_PINS_PER_ROLL));
+			
 			roll.setFirstThrow(new Throw(1, firstThrow));
 			
-			if(index <= BowlingGame.NUMBER_OF_ROLLS_PER_GAME) { // Force all bonus roll has only one throw
+			if(index < BowlingGame.NUMBER_OF_ROLLS_PER_GAME) { // Force all bonus roll has only one throw
 				if (firstThrow < BowlingGame.MAX_PINS_PER_ROLL) {
-					System.out.println("Number of pins knocked in second throw");
-					int secondThrow = sc.nextInt();
+					int pinsRemaining = BowlingGame.MAX_PINS_PER_ROLL - firstThrow;
+					int secondThrow = 0;
+					do{
+						System.out.println("Number of pins knocked in second throw [0-"+pinsRemaining+"]");
+						secondThrow = sc.nextInt();
+					}while((secondThrow < 0  || secondThrow > pinsRemaining));
 					roll.setSecondThrow(new Throw(2, secondThrow));
-				
 				}
 			}
 			game.addRoll(roll);
 			index+=1;
+			
 			System.out.println("Add another roll ? (y/n)");			
 			continue_input = sc.next();			
 			
-		} while (continue_input.equalsIgnoreCase("y"));
+		} while (!continue_input.equalsIgnoreCase("n"));
 		
-		//TODO : Check valid sequence
+		// Check for valid sequence of rolls
 		if(game.numberOfRolls() < BowlingGame.NUMBER_OF_ROLLS_PER_GAME) {
 			throw new Exception(ERROR_NOT_ENOUGHT_ROLLS);
 		}else if (game.numberOfRolls() > (BowlingGame.NUMBER_OF_ROLLS_PER_GAME+2)) {
 			throw new Exception(ERROR_TOO_MUCH_ROLLS);
 		}else {
 			
-			Roll lastRoll = game.getRollAt(BowlingGame.NUMBER_OF_ROLLS_PER_GAME);
+			Roll lastRoll = game.getRollAt(BowlingGame.NUMBER_OF_ROLLS_PER_GAME-1);
 			
 			if( lastRoll.isSpare() & (game.numberOfRolls() != (BowlingGame.NUMBER_OF_ROLLS_PER_GAME+1) )) {
 				throw new Exception(ERROR_NOT_ENOUGHT_ROLLS);
@@ -56,19 +62,25 @@ public class Play {
 				throw new Exception(ERROR_NOT_ENOUGHT_ROLLS);
 			}
 			
-			// Compute game score
-			System.out.println("MAX ROLLS : " + BowlingGame.NUMBER_OF_ROLLS_PER_GAME);
+			// Compute and display game score
+			//int gameScore = 0;
+			System.out.println("Game summary \n "
+					+ "Player : " + game.getPlayer() + " - MAX ROLLS : " + BowlingGame.NUMBER_OF_ROLLS_PER_GAME);
 			for(int i=0;i<BowlingGame.NUMBER_OF_ROLLS_PER_GAME;i++) {
-				System.out.println(game.getRollAt(i).getNumber()
-						+ " : " + game.getRollAt(i).getPinsKnocked() + " Pins"
+				System.out.println(
+						"Roll #"+ game.getRollAt(i).getNumber()
+						+ " : " + game.getRollAt(i).getPinsKnocked()
+						+ " - " + game.getRollAt(i).getDetails() + " Pins"
 						+ " | " + game.getRollAt(i).getResult()
 						+ " | " + game.getRollScore(i));
+				//gameScore += game.getRollScore(i);
 			}
+			System.out.println("Final game result : "+ game.getGameScore() +" Points");
 		}
 		
 		
 		
-		// Check number of frames...
+		
 	}
 
 }
