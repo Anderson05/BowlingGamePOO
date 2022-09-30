@@ -4,6 +4,20 @@
 # Log file
 *.log
 
+local.properties
+.classpath
+.settings/
+.loadpath
+.project
+.metadata
+bin/**
+tmp/**
+tmp/**/*
+*.tmp
+*.bak
+*.swp
+*~.nib
+
 # BlueJ files
 *.ctxt
 
