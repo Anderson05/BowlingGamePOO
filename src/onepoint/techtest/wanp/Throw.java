@@ -1,11 +1,12 @@
+package onepoint.techtest.wanp;
 
 public class Throw {
-	
-    private static final String ERROR_WRONG_PINS_VALUE = "Invalid number of pins knocked down";
-	
+
+	private static final String ERROR_WRONG_PINS_VALUE = "Invalid number of pins knocked down";
+
 	private int number;
 	private int pinsKnocked;
-	
+
 	public Throw() {
 	}
 
@@ -19,7 +20,7 @@ public class Throw {
 		return number;
 	}
 
-	public void setNumber(int number){
+	public void setNumber(int number) {
 		this.number = number;
 	}
 
@@ -33,5 +34,5 @@ public class Throw {
 		}
 		this.pinsKnocked = pinsKnocked;
 	}
-	
+
 }
